@@ -1,0 +1,1659 @@
+<?php
+
+/**
+ * Template Name: New Flexible Template
+ */
+
+get_header();
+$timestamp = get_the_modified_time('U', false, get_the_ID());
+$updated_date = date_i18n('F Y', $timestamp);
+$last_updated_date = date_i18n('j F Y', $timestamp);
+$reviewed_by = get_field('reviewed_by', get_the_ID());
+
+if (have_rows('flexible_temp_builder')) :
+    while (have_rows('flexible_temp_builder')) : the_row();
+        if (get_row_layout() == 'hero_section_flexi') :
+?>
+            <section class="hero-section">
+                <div class="container">
+
+                    <?php
+                    $cus_title = get_sub_field('hero_title_flexi');
+                    $hero_section_icon = get_sub_field('hero_section_icon');
+                    $title = $cus_title ? $cus_title : get_the_title();
+                    ?>
+                    <div class="hero-title">
+                        <?php if ($hero_section_icon) { ?>
+                            <img src="<?php echo $hero_section_icon; ?>" />
+                        <?php } ?>
+                        <h1><?php echo do_shortcode($title); ?></h1>
+                    </div>
+                    <?php if (get_sub_field('hero_description_flexi')) : ?>
+                        <div class="into-text-outer">
+                            <?php echo do_shortcode(get_sub_field('hero_description_flexi')); ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if (have_rows('hero_features_flexi')) : ?>
+                        <div class="hero-features">
+                            <?php while (have_rows('hero_features_flexi')) : the_row(); ?>
+                                <div class="hero-feature-item">
+                                    <?php if (get_sub_field('feature_icon')) : ?>
+                                        <img src="<?php echo get_sub_field('feature_icon'); ?>" />
+                                    <?php endif;
+                                    if (get_sub_field('feature_text_flexi')) : ?>
+                                        <div class="hero-feature-item-text">
+                                            <?php echo do_shortcode(get_sub_field('feature_text_flexi')); ?>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endwhile; ?>
+                        </div>
+                    <?php endif; ?>
+
+                    <div class="hero-tags author-review-part">
+
+                        <?php if (have_rows('hero_tags_flexi')) : ?>
+
+                            <?php while (have_rows('hero_tags_flexi')) : the_row(); ?>
+                                <div class="hero-tags-item">
+                                    <span class="hero-tag-item-text">
+                                        <?php echo do_shortcode(get_sub_field('tags_flexi')); ?>
+                                    </span>
+                                </div>
+                            <?php endwhile; ?>
+                    </div>
+                <?php endif; ?>
+                <div class="review-by-box">
+                    <?php
+                    if (!empty($reviewed_by)) {
+                        $user_display_name = !empty($reviewed_by) ? $reviewed_by['display_name'] : '';
+                        $split_display_name = explode(' ', $user_display_name);
+
+                        $user_initials = '';
+                        if (!empty($split_display_name)) {
+                            if (isset($split_display_name[0])) {
+                                $user_initials .= substr($split_display_name[0], 0, 1);
+                            }
+                            if (isset($split_display_name[1])) {
+                                $user_initials .= substr($split_display_name[1], 0, 1);
+                            }
+                        }
+
+                    ?>
+                        <div class="review-by-author-details">
+                            <div class="user-intials">
+                                <?php echo $user_initials; ?>
+                            </div>
+                            <div class="user-review-by">
+                                <span class="review-box-label"><?php echo __(' Reviewed by', 'new-review-theme'); ?></span>
+                                <span><?php echo $user_display_name; ?></span>
+                            </div>
+                        </div>
+                    <?php } ?>
+                    <div class="last-updated-date-box">
+                        <span class="review-box-label last-update-label"><?php echo __('Letzte Aktualisierung', 'new-review-theme'); ?></span>
+                        <span class="last-update-date"><?php echo esc_html($last_updated_date); ?></span>
+                    </div>
+                </div>
+
+                </div>
+            </section>
+
+            <?php
+        elseif (get_row_layout() == 'content_section_flexi') :
+            if (get_sub_field('field_section_content_flexi')) :
+            ?>
+
+                <section class="body-content hero-body-content-outer">
+                    <div class="container">
+                        <div class="hero-body-content-inr">
+                            <?php
+                            $content = get_sub_field('field_section_content_flexi');
+
+                            if (empty($content)) {
+                                return;
+                            }
+
+                            /* Clean ACF paragraph wrappers */
+                            $array = [
+                                '<p>['    => '[',
+                                ']</p>'   => ']',
+                                ']<br />' => ']',
+                            ];
+                            $content = str_replace(
+                                ['<br />', '<br>'],
+                                '',
+                                $content
+                            );
+                            $content = strtr($content, $array);
+
+
+                            /* Find first FAQ block */
+                            $faq_pos = strpos($content, 'ms_faq ms_card');
+
+                            if ($faq_pos !== false) {
+
+                                // Find where the section actually starts
+                                $section_start = strrpos(substr($content, 0, $faq_pos), '<section');
+
+                                $before = substr($content, 0, $section_start);
+                                $faq_content = substr($content, $section_start);
+
+                                $beforecontent = '<div class="man_faq_sec" itemscope itemtype="https://schema.org/FAQPage">
+                                <script>
+                                jQuery(document).ready(function($){
+                                    $(".accordionButton").click(function(){
+                                        $(".accordionButton").removeClass("on");
+                                        $(".accordionContent").slideUp("normal");
+
+                                        if($(this).next().is(":hidden")){
+                                            $(this).addClass("on");
+                                            $(this).next().slideDown("normal");
+                                        }
+                                    });
+                                });
+                                </script>';
+
+                                $aftercontent = '</div>';
+
+                                echo $before . $beforecontent . $faq_content . $aftercontent;
+                            } else {
+                                echo $content;
+                            }
+                            ?>
+                        </div>
+                    </div>
+                </section>
+
+            <?php
+            endif;
+        elseif (get_row_layout() == 'how_rate_section_flexi') :
+            if (get_sub_field('rating_items_flexi')) :
+            ?>
+
+                <section class="how-rate-section">
+                    <div class="container">
+
+                        <?php
+                        $title = get_sub_field('rating_head_title_new_flexi');
+                        $desc = get_sub_field('rating_head_desc_new_flexi');
+                        if ($title) : ?>
+                            <div class="section-title">
+                                <h2><?php echo do_shortcode($title); ?></h2>
+                            </div>
+                        <?php endif;
+                        if ($desc) : ?>
+                            <div class="section-desc">
+                                <p><?php echo do_shortcode($desc); ?></p>
+                            </div>
+                        <?php endif; ?>
+                        <div class="rating-grid">
+                            <?php while (have_rows('rating_items_flexi')) : the_row(); ?>
+                                <div class="rating-card default-box-style">
+                                    <?php if (get_sub_field('rating_image_flexi')) : ?>
+                                        <div class="rating-card-img">
+                                            <img src="<?php echo esc_url(get_sub_field('rating_image_flexi')); ?>" alt="">
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <?php if (get_sub_field('rating_title_flexi')) : ?>
+                                        <h4><?php echo do_shortcode(get_sub_field('rating_title_flexi')); ?></h4>
+                                    <?php endif; ?>
+
+                                    <?php if (get_sub_field('rating_desc_flexi')) : ?>
+                                        <p><?php echo do_shortcode(get_sub_field('rating_desc_flexi')); ?></p>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endwhile; ?>
+                        </div>
+
+                    </div>
+                </section>
+
+            <?php
+            endif;
+
+        elseif (get_row_layout() == 'payment_section_flexi') :
+            if (get_sub_field('payment_methods_flexi')) :
+            ?>
+
+                <section class="payment-section">
+                    <div class="container">
+                        <?php
+                        $title = get_sub_field('payment_head_title_new_flexi');
+                        if ($title) : ?>
+                            <div class="section-title">
+                                <h4><?php echo do_shortcode($title); ?></h4>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="payment-list">
+                            <?php while (have_rows('payment_methods_flexi')) : the_row(); ?>
+                                <span class="payment-item">
+                                    <?php echo do_shortcode(get_sub_field('payment_name_flexi')); ?>
+                                </span>
+                            <?php endwhile; ?>
+                        </div>
+                    </div>
+                </section>
+            <?php
+            endif;
+        elseif (get_row_layout() == 'casino_review'): ?>
+
+            <section class="review-gradient-section">
+                <div class="container">
+
+                    <!-- TOP -->
+                    <div class="review-gradient-top-text">
+
+                        <?php if (get_sub_field('badge_icon') || get_sub_field('badge_text')): ?>
+                            <span class="review-gradient-editor-heading">
+                                <?php if (get_sub_field('badge_icon')): ?>
+                                    <img src="<?php echo esc_url(get_sub_field('badge_icon')); ?>" alt="img">
+                                <?php endif; ?>
+
+                                <?php if (get_sub_field('badge_text')): ?>
+                                    <?php echo do_shortcode(get_sub_field('badge_text')); ?>
+                                <?php endif; ?>
+                            </span>
+                        <?php endif; ?>
+
+                        <?php if (get_sub_field('main_title') || get_sub_field('Total_score')): ?>
+                            <h2 class="review-gradient-heading">
+                                <?php echo do_shortcode(get_sub_field('main_title')); ?>
+                            </h2>
+                        <?php endif; ?>
+
+                        <?php if (get_sub_field('subtitle')): ?>
+                            <p class="review-gradient-text">
+                                <?php echo do_shortcode(get_sub_field('subtitle')); ?>
+                            </p>
+                        <?php endif; ?>
+
+                    </div>
+
+                    <div class="review-gradient-grid-part">
+                        <div class="review-gradient-grid-left-part">
+
+                            <!-- WHY SECTION -->
+                            <?php if (get_sub_field('why_title') || get_sub_field('why_content')): ?>
+                                <div class="review-gradient-grid-left-part-top">
+
+                                    <?php if (get_sub_field('why_title') || get_sub_field('title_icon')): ?>
+                                        <h3 class="review-gradient-grid-left-part-top-heading">
+
+                                            <?php if (get_sub_field('title_icon')): ?>
+                                                <span class="review-gradient-grid-left-part-top-heading-img">
+                                                    <img src="<?php echo esc_url(get_sub_field('title_icon')); ?>" alt="img">
+                                                </span>
+                                            <?php endif; ?>
+
+                                            <?php echo do_shortcode(get_sub_field('why_title')); ?>
+                                        </h3>
+                                    <?php endif; ?>
+
+                                    <?php if (get_sub_field('why_content')): ?>
+                                        <div class="review-gradient-grid-left-part-top-text">
+                                            <?php echo do_shortcode(get_sub_field('why_content')); ?>
+                                        </div>
+                                    <?php endif; ?>
+
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- BONUS SECTION -->
+                            <?php if (get_sub_field('bonus_title') || get_sub_field('bonus_text')): ?>
+                                <div class="review-gradient-grid-left-part-bottom">
+
+                                    <h3 class="review-gradient-grid-left-part-bottom-heading">
+
+                                        <?php if (get_sub_field('bonus_icon')): ?>
+                                            <span class="review-gradient-grid-left-part-bottom-heading-img">
+                                                <img src="<?php echo esc_url(get_sub_field('bonus_icon')); ?>" alt="img">
+                                            </span>
+                                        <?php endif; ?>
+
+                                        <?php echo do_shortcode(get_sub_field('bonus_title')); ?>
+                                    </h3>
+
+                                    <?php if (get_sub_field('bonus_text')): ?>
+                                        <div class="review-gradient-grid-left-part-bottom-gradient-bg">
+                                            <div class="review-gradient-grid-left-part-bottom-gradient-bg-text">
+                                                <?php echo do_shortcode(get_sub_field('bonus_text')); ?>
+                                            </div>
+                                        </div>
+                                    <?php endif; ?>
+
+                                    <!-- BONUS FEATURES -->
+                                    <?php if (have_rows('bonus_features')): ?>
+                                        <div class="review-gradient-grid-left-part-bottom-gradient-bg-table">
+
+                                            <?php
+                                            $i = 0;
+                                            while (have_rows('bonus_features')): the_row();
+
+                                                if ($i % 3 == 0):
+                                                    echo '<div class="review-gradient-grid-left-part-bottom-gradient-bg-table-inner">';
+                                                endif;
+                                            ?>
+
+                                                <div class="review-gradient-grid-left-part-bottom-gradient-bg-table-inner-part">
+                                                    <?php if (get_sub_field('label')): ?>
+                                                        <span><?php echo do_shortcode(get_sub_field('label')); ?></span>
+                                                    <?php endif; ?>
+
+                                                    <?php if (get_sub_field('value')): ?>
+                                                        <span><?php echo do_shortcode(get_sub_field('value')); ?></span>
+                                                    <?php endif; ?>
+                                                </div>
+
+                                            <?php
+                                                $i++;
+
+                                                if ($i % 3 == 0):
+                                                    echo '</div>';
+                                                endif;
+
+                                            endwhile;
+
+                                            if ($i % 3 != 0):
+                                                echo '</div>';
+                                            endif;
+                                            ?>
+
+                                        </div>
+                                    <?php endif; ?>
+
+                                </div>
+                            <?php endif; ?>
+
+                        </div>
+
+                        <!-- RIGHT SIDE -->
+                        <div class="review-gradient-grid-right-part">
+
+                            <!-- TOTAL SCORE -->
+                            <?php if (get_sub_field('Total_score')): ?>
+                                <div class="review-gradient-grid-right-part-total-score">
+                                    <div class="review-gradient-grid-right-part-total-score-circle">
+                                        <span class="review-gradient-grid-right-part-total-score-circle-content text-white">
+                                            <?php echo get_sub_field('Total_score'); ?>
+                                        </span>
+                                    </div>
+
+                                    <?php if (get_sub_field('total_score_title')): ?>
+                                        <p class="review-gradient-grid-right-part-total-score-circle-text">
+                                            <?php echo get_sub_field('total_score_title'); ?>
+                                        </p>
+                                    <?php endif; ?>
+
+                                    <?php
+                                    $rating = floatval(get_sub_field('Total_score'));
+                                    $full_stars = floor($rating);
+                                    $half_star = ($rating - $full_stars) >= 0.5 ? 1 : 0;
+                                    $empty_stars = 5 - ($full_stars + $half_star);
+                                    ?>
+
+                                    <div class="review-gradient-grid-right-part-total-score-circle-rating">
+                                        <!-- Full Stars -->
+                                        <?php for ($i = 0; $i < $full_stars; $i++): ?>
+                                            <span class="star full">★</span>
+                                        <?php endfor; ?>
+                                        <!-- Half Star -->
+                                        <?php if ($half_star): ?>
+                                            <span class="star half">★</span>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- CATEGORY SCORES -->
+                            <?php
+                            $category_scores_title = get_sub_field('category_scores_title');
+                            if (have_rows('category_scores')): ?>
+                                <div class="review-gradient-grid-right-part-category-scores">
+                                    <h4 class="review-gradient-grid-right-part-category-scores-heading">
+                                        <?php echo $category_scores_title; ?>
+                                    </h4>
+
+                                    <?php while (have_rows('category_scores')): the_row();
+                                        $score = get_sub_field('cat_score');
+                                        $width = $score * 10;
+                                    ?>
+
+                                        <div class="progress-bar-text-part-outer">
+                                            <div class="review-gradient-grid-right-part-category-scores-text">
+                                                <span><?php echo get_sub_field('cat_name'); ?></span>
+                                                <span class="text-yello"><?php echo $score; ?>/10</span>
+                                            </div>
+
+                                            <div class="review-gradient-grid-right-part-category-scores-progress-bar-part">
+                                                <div class="progress-bar" style="width: <?php echo esc_attr($width); ?>%"></div>
+                                            </div>
+                                        </div>
+
+                                    <?php endwhile; ?>
+                                </div>
+                            <?php endif; ?>
+
+                            <!-- QUICK FACTS -->
+                            <?php
+                            $quick_facts_title = get_sub_field('quick_facts_title');
+                            if (have_rows('quick_facts')): ?>
+                                <div class="review-gradient-grid-right-part-quick-facts-part">
+                                    <h4 class="review-gradient-grid-right-part-quick-facts-heading">
+                                        <?php echo $quick_facts_title; ?>
+                                    </h4>
+
+                                    <div class="review-gradient-grid-right-part-quick-facts-part-inner">
+
+                                        <?php while (have_rows('quick_facts')): the_row(); ?>
+                                            <div class="review-gradient-grid-right-part-quick-facts-img">
+                                                <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/quick-facts-img.png" alt="img">
+                                                <span><?php echo do_shortcode(get_sub_field('fact')); ?></span>
+                                            </div>
+                                        <?php endwhile; ?>
+
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+
+                        </div>
+                    </div>
+
+                    <?php if (get_sub_field('pros_heading') || (get_sub_field('payment_heading'))) : ?>
+                        <div class="pros-cons-payment-methods-section">
+                            <?php if (get_sub_field('pros_heading')): ?>
+                                <div class="pros-cons-part">
+                                    <h3 class="section-title">
+                                        <?php echo do_shortcode(get_sub_field('pros_heading')); ?>
+                                    </h3>
+                                    <div class="pros-cons-list">
+                                        <?php if (have_rows('pros_list')): ?>
+                                            <?php while (have_rows('pros_list')): the_row(); ?>
+                                                <?php if (get_sub_field('text')): ?>
+                                                    <div class="pros-item">
+                                                        <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/pros-icon.png" alt="img">
+                                                        <span><?php echo do_shortcode(get_sub_field('text')); ?></span>
+                                                    </div>
+                                                <?php endif; ?>
+                                            <?php endwhile; ?>
+                                        <?php endif; ?>
+                                        <?php if (have_rows('cons_list')): ?>
+                                            <?php while (have_rows('cons_list')): the_row(); ?>
+                                                <?php if (get_sub_field('text')): ?>
+                                                    <div class="cons-item">
+                                                        <img src="<?php echo get_stylesheet_directory_uri(); ?>/assets/images/cons-icon.png" alt="img">
+                                                        <span><?php echo do_shortcode(get_sub_field('text')); ?></span>
+                                                    </div>
+                                                <?php endif; ?>
+                                            <?php endwhile; ?>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            <?php endif; ?>
+                            <div class="payment-methods-part">
+                                <?php if (get_sub_field('payment_heading')): ?>
+                                    <h3 class="section-title">
+                                        <?php echo do_shortcode(get_sub_field('payment_heading')); ?>
+                                    </h3>
+                                <?php endif; ?>
+                                <?php if (have_rows('accept_payment_methods')): ?>
+                                    <div class="payment-grid">
+                                        <?php while (have_rows('accept_payment_methods')): the_row(); ?>
+                                            <?php
+                                            $icon = get_sub_field('icon');
+                                            $title = get_sub_field('title');
+                                            $subtitle = get_sub_field('subtitle');
+                                            ?>
+                                            <?php if ($title || $icon): ?>
+                                                <div class="payment-card">
+                                                    <?php if ($icon): ?>
+                                                        <div class="pm-icon">
+                                                            <img src="<?php echo esc_url($icon); ?>" alt="<?php echo esc_attr($title); ?>">
+                                                        </div>
+                                                    <?php endif; ?>
+                                                    <div class="pm-content">
+                                                        <?php if ($title): ?>
+                                                            <h4><?php echo do_shortcode($title); ?></h4>
+                                                        <?php endif; ?>
+                                                        <?php if ($subtitle): ?>
+                                                            <p><?php echo do_shortcode($subtitle); ?></p>
+                                                        <?php endif; ?>
+                                                    </div>
+                                                </div>
+                                            <?php endif; ?>
+                                        <?php endwhile; ?>
+                                    </div>
+                                <?php endif; ?>
+
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- CTA -->
+                    <?php if (get_sub_field('cta_title') || get_sub_field('cta_button')): ?>
+                        <div class="review-gradient-bottom-full-part">
+                            <div class="review-gradient-bottom-full-inner">
+
+                                <?php if (get_sub_field('cta_title')): ?>
+                                    <h3 class="review-gradient-bottom-full-heading">
+                                        <?php echo do_shortcode(get_sub_field('cta_title')); ?>
+                                    </h3>
+                                <?php endif; ?>
+
+                                <?php if (get_sub_field('cta_subtitle')): ?>
+                                    <p class="review-gradient-bottom-full-text">
+                                        <?php echo do_shortcode(get_sub_field('cta_subtitle')); ?>
+                                    </p>
+                                <?php endif; ?>
+
+                                <?php
+                                $link = get_sub_field('cta_button');
+                                if ($link): ?>
+                                    <a href="<?php echo esc_url($link['url']); ?>" class="review-gradient-bottom-full-cta-btn">
+                                        <?php echo $link['title']; ?>
+                                    </a>
+                                <?php endif; ?>
+
+                                <?php if (have_rows('info_list')): ?>
+                                    <p class="review-gradient-bottom-full-end-text">
+                                        <?php
+                                        $info = [];
+                                        while (have_rows('info_list')): the_row();
+                                            $info[] = get_sub_field('value');
+                                        endwhile;
+                                        echo implode(' | ', $info);
+                                        ?>
+                                    </p>
+                                <?php endif; ?>
+
+                            </div>
+                        </div>
+                    <?php endif; ?>
+
+                </div>
+            </section>
+
+        <?php
+        elseif (get_row_layout() == 'play_responsibly_flexi'):
+
+            // Get subfields
+            $icon = get_sub_field('play_responsibly_icon');
+            $title = get_sub_field('play_responsibly_new_flexi');
+            $description = get_sub_field('play_responsibly_desc_new_flexi');
+            $tags = get_sub_field('play_list');
+
+        ?>
+            <section class="play-responsibly-section">
+                <div class="container">
+                    <div class="play-responsibly-wrapper">
+                        <div class="play-responsibly-wrapper-inner">
+                            <?php if ($icon): ?>
+                                <div class="play-responsibly-icon">
+                                    <img src="<?php echo esc_url($icon); ?>" alt="<?php echo esc_attr($title); ?>">
+                                </div>
+                            <?php endif; ?>
+
+                            <div class="play-responsibly-content-part">
+                                <?php if ($title): ?>
+                                    <h2 class="play-responsibly-title"><?php echo do_shortcode($title); ?></h2>
+                                <?php endif; ?>
+
+                                <?php if ($description): ?>
+                                    <p class="play-responsibly-description"><?php echo do_shortcode($description); ?></p>
+                                <?php endif; ?>
+
+                                <?php if ($tags): ?>
+                                    <div class="play-responsibly-tags">
+                                        <?php foreach ($tags as $tag): ?>
+                                            <div class="play-responsibly-tags-inner"><?php echo do_shortcode($tag['tags_content']); ?></div>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php endif; ?>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        <?php
+        elseif (get_row_layout() == 'casino_comparison_table'):
+
+            $title = get_sub_field('title');
+            $subtitle = get_sub_field('subtitle');
+            $columns = get_sub_field('columns');
+            $rows = get_sub_field('rows');
+        ?>
+
+            <section class="casino-comparison-table gradient-bg">
+                <div class="container">
+                    <?php
+                    if (strpos($title, '#') === 0) {
+                        $title = preg_replace('/^#\s*/', '', $title);
+                        echo '<h2 class="section-title"><span class="highlight">#</span> ' . esc_html($title) . '</h2>';
+                    } else {
+                        echo '<h2 class="section-title">' . esc_html($title) . '</h2>';
+                    }
+                    ?>
+                    <?php if ($subtitle) : ?>
+                        <p><?php echo esc_html($subtitle); ?></p>
+                    <?php endif; ?>
+                    <?php if ($rows): ?>
+                        <div class="cus-table-outer">
+                            <table class="cus-table casino-comparison-table">
+                                <thead>
+                                    <tr>
+                                        <th><?php echo esc_html($columns['casino']); ?></th>
+                                        <th><?php echo esc_html($columns['rating']); ?></th>
+                                        <th><?php echo esc_html($columns['bonus']); ?></th>
+                                        <th><?php echo esc_html($columns['feature']); ?></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php if ($rows): foreach ($rows as $row): ?>
+                                            <tr>
+                                                <td><?php echo esc_html($row['casino_name']); ?></td>
+                                                <td><?php echo esc_html($row['rating']); ?></td>
+                                                <td><?php echo esc_html($row['bonus']); ?></td>
+                                                <td><?php echo esc_html($row['feature']); ?></td>
+                                            </tr>
+                                    <?php endforeach;
+                                    endif; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </section>
+
+        <?php
+        elseif (get_row_layout() === 'casino_reviews_section'):
+
+            $title = get_sub_field('title');
+            $subtitle = get_sub_field('subtitle');
+        ?>
+
+            <section class="casino-reviews-section">
+                <div class="container">
+
+                    <!-- Section Header -->
+                    <div class="section-header text-center">
+                        <?php
+
+                        echo '<h2 class="section-title">' . $title . '</h2>';
+
+                        ?>
+                        <?php if ($subtitle) : ?>
+                            <p><?php echo esc_html($subtitle); ?></p>
+                        <?php endif; ?>
+                    </div>
+
+                    <?php if (have_rows('reviews')): ?>
+                        <div class="reviews-wrapper">
+
+                            <?php while (have_rows('reviews')): the_row();
+
+                                $name = get_sub_field('casino_name');
+                                $logo = get_sub_field('logo');
+                                $rating = get_sub_field('rating');
+                                $screenshot = get_sub_field('screenshot');
+                                $cta_text = get_sub_field('cta_text');
+                                $cta_link = get_sub_field('cta_link');
+                                $disclaimer = get_sub_field('disclaimer');
+                                $desc = get_sub_field('bonus_desc');
+                                $casino_text = get_sub_field('casino_text');
+                                $is_editor_choice = get_sub_field('is_editor_choice');
+                                $editor_choice_text = get_sub_field('editor_choice_text');
+                                $casino_reviews_content = get_sub_field('casino_reviews_content');
+
+                                // Replace ##text## with <span>text</span>
+                                $desc = $desc ? preg_replace('/##(.*?)##/', '<span>$1</span>', $desc) : '';
+                            ?>
+
+                                <div class="casino-card default-box-style">
+
+                                    <!-- Header -->
+                                    <div class="card-header">
+                                        <div class="card-header-left">
+                                            <div class="card-header-left-text">
+                                                <h3><?php echo esc_html($name); ?>
+                                                    <?php if ($is_editor_choice && $editor_choice_text): ?>
+                                                        <span><?php echo $editor_choice_text; ?></span>
+                                                    <?php endif; ?>
+                                                </h3>
+                                                <?php if ($casino_text): ?>
+                                                    <p><?php echo $casino_text; ?></p>
+                                                <?php endif; ?>
+
+                                            </div>
+                                        </div>
+                                        <div class="rating-badge">
+                                            <div class="rating-circle" style="--score : <?php echo $rating * 10; ?>"><?php echo esc_html($rating); ?></div>
+                                            <div class="stars">
+                                                <span>Gesamtpunktzahl</span>
+                                                <span> ★★★★★ </span>
+                                            </div>
+                                        </div>
+                                    </div>
+
+
+                                    <div class="casino-reviews-content-area">
+                                        <!-- Screenshot -->
+                                        <?php if ($screenshot): ?>
+                                            <div class="card-image">
+                                                <img src="<?php echo esc_url($screenshot['url']); ?>" alt="<?php echo esc_html($name); ?>">
+                                            </div>
+                                        <?php endif; ?>
+                                        <div class="casino-review-content-inner">
+                                            <div class="review-content-inner-left">
+                                                <?php if ($casino_reviews_content) : ?>
+                                                    <div class="casino-reviews-content">
+                                                        <?php echo $casino_reviews_content; ?>
+                                                    </div>
+                                                <?php endif; ?>
+                                                
+                                                <?php 
+                                                $bonus_title = get_sub_field('bonus_title');
+                                                if (have_rows('pros') || have_rows('cons') || have_rows('ratings') || $bonus_title) : ?>
+                                                <div class="reviews-btm-row-outer">
+                                                    
+                                                <?php if (have_rows('pros') || have_rows('cons') || $bonus_title) : ?>
+                                                    <div class="reviews-btm-row-outer-left">
+                                                        <?php if($bonus_title) : ?>
+                                                            <div class="bonus-box">
+                                                                <h3><strong><?php echo $bonus_title; ?></strong></h3>
+                                                                <?php if ($desc) : ?>
+                                                                    <p class="bonus-description"><?php echo wp_kses_post($desc); ?></p>
+                                                                <?php endif; ?>
+                                                                <?php if (get_sub_field('bonus_tc')) : ?>
+                                                                    <p class="casino-reviews-terms"><?php the_sub_field('bonus_tc'); ?></p>
+                                                                <?php endif; ?>
+                                                            </div>
+                                                            <?php endif; ?>
+
+                                                            <!-- Pros / Cons -->
+                                                            <?php if (have_rows('pros') || have_rows('cons')): ?>
+                                                                <div class="reviews-pros-cons-part">
+                                                                    <?php if (have_rows('pros')): ?>
+                                                                        <div class="pros">
+                                                                            <h5>Vorteile</h5>
+                                                                            <ul>
+                                                                                <?php while (have_rows('pros')): the_row(); ?>
+                                                                                    <li><?php the_sub_field('text'); ?></li>
+                                                                                <?php endwhile; ?>
+                                                                            </ul>
+                                                                        </div>
+                                                                    <?php endif; ?>
+                                                                    <?php if (have_rows('cons')): ?>
+                                                                        <div class="cons">
+                                                                            <h5>Nachteile</h5>
+                                                                            <ul>
+                                                                                <?php while (have_rows('cons')): the_row(); ?>
+                                                                                    <li><?php the_sub_field('text'); ?></li>
+                                                                                <?php endwhile; ?>
+                                                                            </ul>
+                                                                        </div>
+                                                                    <?php endif; ?>
+                                                                </div>
+                                                            <?php endif; ?>
+                                                        </div>
+                                                        <?php endif; ?>
+
+                                                        <?php if (have_rows('ratings')): ?>
+                                                            <div class="review-content-inner-right rating-breakdown-items">
+
+                                                                <div class="rating-card">
+                                                                    <div class="rating-title">RATINGS BREAKDOWN</div>
+
+                                                                    <?php while (have_rows('ratings')): the_row();
+                                                                        $label = get_sub_field('label');
+                                                                        $value = get_sub_field('value');
+                                                                    ?>
+                                                                        <div class="rating-row">
+                                                                            <div class="rating-top">
+                                                                                <span class="label"><?php echo esc_html($label); ?></span>
+                                                                                <span class="value"><?php echo esc_html($value); ?></span>
+                                                                            </div>
+
+                                                                            <div class="bar">
+                                                                                <div class="fill" style="width: <?php echo esc_attr($value * 10); ?>%"></div>
+                                                                            </div>
+                                                                        </div>
+                                                                    <?php endwhile; ?>
+
+                                                                    <?php $overall = get_field('overall_rating'); ?>
+                                                                    <?php if ($overall): ?>
+                                                                        <div class="rating-row overall">
+                                                                            <div class="rating-top">
+                                                                                <span class="label">Overall</span>
+                                                                                <span class="value"><?php echo esc_html($overall); ?>/10</span>
+                                                                            </div>
+
+                                                                            <div class="bar">
+                                                                                <div class="fill" style="width: <?php echo esc_attr($overall * 10); ?>%"></div>
+                                                                            </div>
+                                                                        </div>
+                                                                    <?php endif; ?>
+
+                                                                    <?php
+                                                                    $cta_text = get_sub_field('cta_text');
+                                                                    $cta_link = get_sub_field('cta_link');
+                                                                    ?>
+
+                                                                    <?php if ($cta_text && $cta_link): ?>
+                                                                        <a href="<?php echo esc_url($cta_link); ?>" target="_blank" rel="nofollow sponsored" class="btn">
+                                                                            <?php echo esc_html($cta_text); ?>
+                                                                        </a>
+                                                                    <?php endif; ?>
+
+                                                                    <?php $disclaimer = get_sub_field('disclaimer'); ?>
+                                                                    <?php if ($disclaimer): ?>
+                                                                        <div class="disclaimer"><?php echo esc_html($disclaimer); ?></div>
+                                                                    <?php endif; ?>
+                                                                </div>
+
+                                                            </div>
+                                                        <?php endif; ?>
+                                                </div>
+                                                <?php endif; ?>
+
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
+                            <?php endwhile; ?>
+
+                        </div>
+                    <?php endif; ?>
+
+                </div>
+            </section>
+        <?php
+        elseif (get_row_layout() === 'feature_comparison'):
+
+            $title = get_sub_field('title');
+            $subtitle = get_sub_field('subtitle');
+            $columns = get_sub_field('columns');
+            $rows = get_sub_field('rows');
+        ?>
+
+            <section class="feature-comparison">
+                <div class="container">
+
+                    <div class="section-header text-center">
+                        <?php
+                        if (strpos($title, '#') === 0) {
+                            $title = preg_replace('/^#\s*/', '', $title);
+                            echo '<h2 class="section-title"><span class="highlight">#</span> ' . esc_html($title) . '</h2>';
+                        } else {
+                            echo '<h2 class="section-title">' . esc_html($title) . '</h2>';
+                        }
+                        ?>
+                        <?php if ($subtitle) : ?>
+                            <p><?php echo esc_html($subtitle); ?></p>
+                        <?php endif; ?>
+                    </div>
+                    <div class="cus-table-outer">
+                        <table class="cus-table feature-comparison-table">
+
+                            <!-- HEADER -->
+                            <thead>
+                                <tr>
+                                    <th>Feature</th>
+                                    <?php if ($columns): foreach ($columns as $col): ?>
+                                            <th><?php echo esc_html($col['name']); ?></th>
+                                    <?php endforeach;
+                                    endif; ?>
+                                </tr>
+                            </thead>
+
+                            <!-- BODY -->
+                            <tbody>
+                                <?php if ($rows): foreach ($rows as $row): ?>
+                                        <tr>
+                                            <td class="feature-name">
+                                                <?php echo esc_html($row['feature']); ?>
+                                            </td>
+
+                                            <?php if (!empty($row['values'])): ?>
+                                                <?php foreach ($row['values'] as $val): ?>
+                                                    <td class="value">
+                                                        <?php if ($val['value'] === 'yes'): ?>
+                                                            <span class="yes">✓</span>
+                                                        <?php else: ?>
+                                                            <span class="no">✗</span>
+                                                        <?php endif; ?>
+                                                    </td>
+                                                <?php endforeach; ?>
+                                            <?php endif; ?>
+
+                                        </tr>
+                                <?php endforeach;
+                                endif; ?>
+                            </tbody>
+
+                        </table>
+                    </div>
+                </div>
+            </section>
+        <?php
+        elseif (get_row_layout() === 'casino_bonus_types'):
+
+            $title = get_sub_field('title');
+            $subtitle = get_sub_field('subtitle');
+
+        ?>
+
+            <section class="types-casino-bonuses-section gradient-bg sec-pad">
+                <div class="container">
+
+                    <div class="section-header text-center">
+                        <?php
+                        if (strpos($title, '#') === 0) {
+                            $title = preg_replace('/^#\s*/', '', $title);
+                            echo '<h2 class="section-title"><span class="highlight">#</span> ' . esc_html($title) . '</h2>';
+                        } else {
+                            echo '<h2 class="section-title">' . esc_html($title) . '</h2>';
+                        }
+                        ?>
+                        <?php if ($subtitle) : ?>
+                            <p><?php echo esc_html($subtitle); ?></p>
+                        <?php endif; ?>
+                    </div>
+                    <?php if (have_rows('casino_bonus_types_list')) : ?>
+                        <div class="bonus-types-list">
+                            <?php
+                            while (have_rows('casino_bonus_types_list')): the_row(); ?>
+                                <div class="bonus-type-item default-box-style">
+                                    <div class="bonus-type-title"><?php the_sub_field('bonus_type_name'); ?></div>
+                                    <div class="bonus-type-description"><?php the_sub_field('bonus_type_description'); ?></div>
+                                    <div class="bonus-type-tip"><?php the_sub_field('bonus_type_tip'); ?></div>
+                                </div>
+                            <?php endwhile; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </section>
+        <?php
+        elseif (get_row_layout() === 'why_choose_section'):
+
+            $header = get_sub_field('header');
+            $cards  = get_sub_field('cards');
+            $title  = $header['title'] ?? '';
+            $sub    = $header['subtitle'] ?? '';
+        ?>
+
+            <section class="why-choose-section sec-pad">
+                <div class="container">
+
+                    <!-- Header -->
+                    <div class="section-header text-center">
+                        <?php
+                        if (strpos($title, '#') === 0) {
+                            $title = preg_replace('/^#\s*/', '', $title);
+                            echo '<h2 class="section-title"><span class="highlight">#</span> ' . esc_html($title) . '</h2>';
+                        } else {
+                            echo '<h2 class="section-title">' . esc_html($title) . '</h2>';
+                        }
+                        ?>
+                        <?php if ($sub): ?>
+                            <p class="section-subtitle"><?php echo esc_html($sub); ?></p>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Cards -->
+                    <?php if ($cards): ?>
+                        <div class="why-grid">
+                            <?php foreach ($cards as $card): ?>
+                                <div class="why-card default-box-style">
+                                    <div class="why-card-title bold-title"><?php echo esc_html($card['title']); ?></div>
+                                    <p><?php echo esc_html($card['content']); ?></p>
+
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+
+                </div>
+            </section>
+        <?php
+        elseif (get_row_layout() === 'popular_casino_games_section'):
+
+            $header = get_sub_field('header');
+            $cards  = get_sub_field('cards');
+            $title  = $header['title'] ?? '';
+            $sub    = $header['subtitle'] ?? '';
+            $rtp_title   = get_sub_field('rtp_title');
+            $headers = get_sub_field('headers');
+            $rows    = get_sub_field('rows');
+        ?>
+
+            <section class="popular-casino-games-section gradient-bg sec-pad">
+                <div class="container">
+
+                    <!-- Header -->
+                    <div class="section-header text-center">
+                        <?php
+                        if (strpos($title, '#') === 0) {
+                            $title = preg_replace('/^#\s*/', '', $title);
+                            echo '<h2 class="section-title"><span class="highlight">#</span> ' . esc_html($title) . '</h2>';
+                        } else {
+                            echo '<h2 class="section-title">' . esc_html($title) . '</h2>';
+                        }
+                        ?>
+                        <?php if ($sub): ?>
+                            <p class="section-subtitle"><?php echo esc_html($sub); ?></p>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Cards -->
+                    <?php if ($cards): ?>
+                        <div class="popular-casino-games-grid">
+                            <?php foreach ($cards as $card): ?>
+                                <div class="popular-casino-games-card default-box-style">
+                                    <?php if (!empty($card['icon'])): ?>
+                                        <img src="<?php echo esc_url($card['icon']['url']); ?>" class="icon">
+                                    <?php endif; ?>
+                                    <div class="popular-casino-title bold-title"><?php echo esc_html($card['title']); ?></div>
+                                    <p><?php echo esc_html($card['content']); ?></p>
+
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                    <?php if ($rows): ?>
+                        <div class="rtp-section default-box-style">
+                            <?php if ($rtp_title): ?>
+                                <div class="rtp-title"><?php echo esc_html($rtp_title); ?></div>
+                            <?php endif; ?>
+
+                            <?php if ($rows): ?>
+                                <div class="rtp-table-wrapper cus-table-outer">
+                                    <table class="cus-table rtp-table">
+
+                                        <thead>
+                                            <tr>
+                                                <th><?php echo esc_html($headers['col1']); ?></th>
+                                                <th><?php echo esc_html($headers['col2']); ?></th>
+                                                <th><?php echo esc_html($headers['col3']); ?></th>
+                                            </tr>
+                                        </thead>
+
+                                        <tbody>
+                                            <?php foreach ($rows as $row): ?>
+                                                <tr>
+                                                    <td><?php echo esc_html($row['game']); ?></td>
+                                                    <td class="rtp-highlight"><?php echo esc_html($row['rtp']); ?></td>
+                                                    <td><?php echo esc_html($row['edge']); ?></td>
+                                                </tr>
+                                            <?php endforeach; ?>
+                                        </tbody>
+
+                                    </table>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+
+                </div>
+            </section>
+        <?php
+        elseif (get_row_layout() === 'how_to_join_section'):
+
+            $header = get_sub_field('header');
+            $cards  = get_sub_field('htj_steps');
+            $title  = $header['title'] ?? '';
+            $sub    = $header['subtitle'] ?? '';
+        ?>
+
+            <section class="how-to-join-section gradient-bg sec-pad">
+                <div class="container">
+
+                    <!-- Header -->
+                    <div class="section-header text-center">
+                        <?php
+                        if (strpos($title, '#') === 0) {
+                            $title = preg_replace('/^#\s*/', '', $title);
+                            echo '<h2 class="section-title"><span class="highlight">#</span> ' . esc_html($title) . '</h2>';
+                        } else {
+                            echo '<h2 class="section-title">' . esc_html($title) . '</h2>';
+                        }
+                        ?>
+                        <?php if ($sub): ?>
+                            <p class="section-subtitle"><?php echo esc_html($sub); ?></p>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Cards -->
+                    <?php if ($cards): ?>
+                        <div class="how-to-join-grid">
+                            <?php foreach ($cards as $card): ?>
+                                <div class="how-to-join-card">
+                                    <div class="how-to-join-title bold-title"><?php echo esc_html($card['title']); ?></div>
+                                    <p><?php echo esc_html($card['content']); ?></p>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+
+                </div>
+            </section>
+        <?php
+        elseif (get_row_layout() === 'casino_table_section'):
+
+            $header  = get_sub_field('header');
+            $columns = get_sub_field('columns');
+            $rows    = get_sub_field('rows');
+
+        ?>
+
+            <section class="casino-table-section sec-pad gradient-bg">
+                <div class="container">
+
+                    <!-- Header -->
+                    <div class="section-header text-center">
+                        <?php
+                        if (strpos($header['title'], '#') === 0) {
+                            $title = preg_replace('/^#\s*/', '', $header['title']);
+                            echo '<h2 class="section-title"><span class="highlight">#</span> ' . esc_html($title) . '</h2>';
+                        } else {
+                            echo '<h2 class="section-title">' . esc_html($header['title']) . '</h2>';
+                        }
+                        ?>
+
+                        <?php if (!empty($header['subtitle'])): ?>
+                            <p class="section-subtitle"><?php echo esc_html($header['subtitle']); ?></p>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Table -->
+                    <?php if ($rows): ?>
+                        <div class="table-wrapper cus-table-outer">
+                            <table class="cus-table casino-table">
+                                <?php if ($columns): ?>
+                                    <thead>
+                                        <tr>
+                                            <?php foreach ($columns as $col): ?>
+                                                <th><?php echo esc_html($col['label']); ?></th>
+                                            <?php endforeach; ?>
+                                        </tr>
+                                    </thead>
+                                <?php endif; ?>
+
+                                <!-- TBODY -->
+                                <tbody>
+                                    <?php foreach ($rows as $row): ?>
+                                        <tr>
+                                            <?php foreach ($row['cells'] as $cell): ?>
+                                                <td class="<?php echo $cell['highlight'] ? 'is-highlight' : ''; ?>">
+                                                    <?php echo esc_html($cell['value']); ?>
+                                                </td>
+                                            <?php endforeach; ?>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+
+                            </table>
+                        </div>
+                    <?php endif; ?>
+
+                </div>
+            </section>
+        <?php
+        elseif (get_row_layout() === 'security_features_section'):
+
+            $header = get_sub_field('header');
+            $cards  = get_sub_field('cards');
+
+        ?>
+
+            <section class="security-section sec-pad">
+                <div class="container">
+
+                    <!-- Header -->
+                    <div class="section-header text-center">
+                        <?php
+                        if (strpos($header['title'], '#') === 0) {
+                            $title = preg_replace('/^#\s*/', '', $header['title']);
+                            echo '<h2 class="section-title"><span class="highlight">#</span> ' . esc_html($title) . '</h2>';
+                        } else {
+                            echo '<h2 class="section-title">' . esc_html($header['title']) . '</h2>';
+                        }
+                        ?>
+
+                        <?php if (!empty($header['subtitle'])): ?>
+                            <p class="section-subtitle"><?php echo esc_html($header['subtitle']); ?></p>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Cards -->
+                    <?php if ($cards): ?>
+                        <div class="security-grid">
+
+                            <?php foreach ($cards as $card):
+                                $width = $card['width'] === 'full' ? 'full' : 'half';
+                            ?>
+
+                                <div class="security-card default-box-style <?php echo $width; ?>">
+
+
+
+                                    <div class="security-card-title bold-title">
+                                        <?php if (!empty($card['icon'])): ?>
+                                            <img src="<?php echo esc_url($card['icon']['url']); ?>" class="icon" alt="">
+                                        <?php endif; ?>
+                                        <?php echo esc_html($card['title']); ?>
+                                    </div>
+                                    <p><?php echo esc_html($card['content']); ?></p>
+
+                                </div>
+
+                            <?php endforeach; ?>
+
+                        </div>
+                    <?php endif; ?>
+
+                </div>
+            </section>
+        <?php
+        elseif (get_row_layout() === 'software_developers_section'):
+
+            $header  = get_sub_field('header');
+            $columns = get_sub_field('columns');
+            $rows    = get_sub_field('rows');
+
+        ?>
+
+            <section class="dev-table-section sec-pad gradient-bg">
+                <div class="container">
+
+                    <!-- Header -->
+                    <div class="section-header text-center">
+                        <?php
+                        if (strpos($header['title'], '#') === 0) {
+                            $title = preg_replace('/^#\s*/', '', $header['title']);
+                            echo '<h2 class="section-title"><span class="highlight">#</span> ' . esc_html($title) . '</h2>';
+                        } else {
+                            echo '<h2 class="section-title">' . esc_html($header['title']) . '</h2>';
+                        }
+                        ?>
+
+                        <?php if (!empty($header['subtitle'])): ?>
+                            <p class="section-subtitle"><?php echo esc_html($header['subtitle']); ?></p>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Table -->
+                    <?php if ($rows): ?>
+                        <div class="table-wrapper cus-table-outer">
+                            <table class="cus-table dev-table">
+
+                                <thead>
+                                    <tr>
+                                        <th><?php echo esc_html($columns['col1']); ?></th>
+                                        <th><?php echo esc_html($columns['col2']); ?></th>
+                                        <th><?php echo esc_html($columns['col3']); ?></th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <?php foreach ($rows as $row): ?>
+                                        <tr>
+                                            <td class="dev-name"><?php echo esc_html($row['name']); ?></td>
+                                            <td><?php echo esc_html($row['speciality']); ?></td>
+                                            <td class="dev-games"><?php echo esc_html($row['games']); ?></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+
+                            </table>
+                        </div>
+                    <?php endif; ?>
+
+                </div>
+            </section>
+        <?php
+        elseif (get_row_layout() === 'tips_section'):
+
+            $header = get_sub_field('header');
+            $cards  = get_sub_field('tips_steps');
+            $title  = $header['title'] ?? '';
+            $sub    = $header['subtitle'] ?? '';
+        ?>
+
+            <section class="tips-section sec-pad">
+                <div class="container">
+
+                    <!-- Header -->
+                    <div class="section-header text-center">
+                        <?php
+                        if (strpos($title, '#') === 0) {
+                            $title = preg_replace('/^#\s*/', '', $title);
+                            echo '<h2 class="section-title"><span class="highlight">#</span> ' . esc_html($title) . '</h2>';
+                        } else {
+                            echo '<h2 class="section-title">' . esc_html($title) . '</h2>';
+                        }
+                        ?>
+                        <?php if ($sub): ?>
+                            <p class="section-subtitle"><?php echo esc_html($sub); ?></p>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Cards -->
+                    <?php if ($cards): ?>
+                        <div class="tips-grid">
+                            <?php foreach ($cards as $card): ?>
+                                <div class="tips-card default-box-style">
+                                    <div class="tips-title bold-title"><?php echo esc_html($card['title']); ?></div>
+                                    <p><?php echo esc_html($card['content']); ?></p>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+
+                </div>
+            </section>
+        <?php
+        elseif (get_row_layout() === 'comparison_table_section'):
+
+            $header  = get_sub_field('header');
+            $columns = get_sub_field('columns');
+            $rows    = get_sub_field('rows');
+            $note    = get_sub_field('note');
+
+        ?>
+
+            <section class="comparison-section sec-pad gradient-bg">
+                <div class="container">
+
+                    <!-- Header -->
+                    <div class="section-header text-center">
+                        <?php
+                        if (strpos($header['title'], '#') === 0) {
+                            $title = preg_replace('/^#\s*/', '', $header['title']);
+                            echo '<h2 class="section-title"><span class="highlight">#</span> ' . esc_html($title) . '</h2>';
+                        } else {
+                            echo '<h2 class="section-title">' . esc_html($header['title']) . '</h2>';
+                        }
+                        ?>
+
+                        <?php if ($header['subtitle']): ?>
+                            <p class="section-subtitle"><?php echo esc_html($header['subtitle']); ?></p>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Table -->
+                    <?php if ($rows): ?>
+                        <div class="table-wrapper cus-table-outer">
+                            <table class="cus-table comparison-table">
+
+                                <thead>
+                                    <tr>
+                                        <th><?php echo esc_html($columns['feature']); ?></th>
+                                        <th><?php echo esc_html($columns['col2']); ?></th>
+                                        <th><?php echo esc_html($columns['col3']); ?></th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <?php foreach ($rows as $row): ?>
+                                        <tr>
+                                            <td><?php echo esc_html($row['feature']); ?></td>
+
+                                            <td class="<?php echo 'is-' . $row['color_1']; ?>">
+                                                <?php echo esc_html($row['value_1']); ?>
+                                            </td>
+
+                                            <td class="<?php echo 'is-' . $row['color_2']; ?>">
+                                                <?php echo esc_html($row['value_2']); ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+
+                            </table>
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- Note -->
+                    <?php if ($note): ?>
+                        <p class="comparison-note"><?php echo esc_html($note); ?></p>
+                    <?php endif; ?>
+
+                </div>
+            </section>
+        <?php
+        elseif (get_row_layout() === 'sport_betting_section'):
+
+            $header  = get_sub_field('header');
+            $content    = get_sub_field('content');
+            $list    = get_sub_field('list');
+
+        ?>
+
+            <section class="sport-betting-section sec-pad">
+                <div class="container">
+
+                    <!-- Header -->
+                    <div class="section-header text-center">
+                        <?php
+                        if (strpos($header['title'], '#') === 0) {
+                            $title = preg_replace('/^#\s*/', '', $header['title']);
+                            echo '<h2 class="section-title"><span class="highlight">#</span> ' . esc_html($title) . '</h2>';
+                        } else {
+                            echo '<h2 class="section-title">' . esc_html($header['title']) . '</h2>';
+                        }
+                        ?>
+
+                        <?php if ($header['subtitle']): ?>
+                            <p class="section-subtitle"><?php echo esc_html($header['subtitle']); ?></p>
+                        <?php endif; ?>
+                    </div>
+
+                    <div class="sport-betting-content-outer">
+
+                        <?php if ($content) : ?>
+                            <div class="sport-betting-content default-box-style">
+                                <?php echo $content; ?>
+                            </div>
+                        <?php endif; ?>
+                        <?php if (have_rows('list')): ?>
+                            <div class="sport-betting-list">
+                                <?php while (have_rows('list')): the_row();
+                                    $icon = get_sub_field('icon');
+                                    $title = get_sub_field('title');
+                                    $subtitle = get_sub_field('subtitle');
+                                ?>
+                                    <div class="sport-betting-list-item default-box-style text-center">
+                                        <?php if ($icon): ?>
+                                            <img src="<?php echo esc_url($icon['url']); ?>" class="sport-betting-list-icon">
+                                        <?php endif; ?>
+                                        <div class="sb-title"><?php echo $title; ?></div>
+                                        <div class="sb-subtitle"><?php echo $subtitle; ?></div>
+                                    </div>
+                                <?php endwhile; ?>
+                            </div>
+                        <?php endif; ?>
+
+                    </div>
+
+                </div>
+            </section>
+        <?php
+        elseif (get_row_layout() === 'banking_options_sections'):
+
+            $header  = get_sub_field('header');
+            $columns = get_sub_field('columns');
+            $rows    = get_sub_field('rows');
+            $note    = get_sub_field('note');
+
+        ?>
+
+            <section class="banking-options-section sec-pad gradient-bg">
+                <div class="container">
+
+                    <!-- Header -->
+                    <div class="section-header text-center">
+                        <?php
+                        if (strpos($header['title'], '#') === 0) {
+                            $title = preg_replace('/^#\s*/', '', $header['title']);
+                            echo '<h2 class="section-title"><span class="highlight">#</span> ' . esc_html($title) . '</h2>';
+                        } else {
+                            echo '<h2 class="section-title">' . esc_html($header['title']) . '</h2>';
+                        }
+                        ?>
+
+                        <?php if ($header['subtitle']): ?>
+                            <p class="section-subtitle"><?php echo esc_html($header['subtitle']); ?></p>
+                        <?php endif; ?>
+                    </div>
+
+                    <!-- Table -->
+                    <?php if ($rows): ?>
+                        <div class="table-wrapper cus-table-outer">
+                            <table class="cus-table banking-options-table ">
+
+                                <thead>
+                                    <tr>
+                                        <th><?php echo esc_html($columns['method']); ?></th>
+                                        <th><?php echo esc_html($columns['col2']); ?></th>
+                                        <th><?php echo esc_html($columns['col3']); ?></th>
+                                        <th><?php echo esc_html($columns['col4']); ?></th>
+                                        <th><?php echo esc_html($columns['col5']); ?></th>
+                                    </tr>
+                                </thead>
+
+                                <tbody>
+                                    <?php foreach ($rows as $row): ?>
+                                        <tr>
+                                            <td><?php echo esc_html($row['method']); ?></td>
+
+                                            <td class="<?php echo 'is-' . $row['color_1']; ?>">
+                                                <?php echo esc_html($row['value_1']); ?>
+                                            </td>
+
+                                            <td class="<?php echo 'is-' . $row['color_2']; ?>">
+                                                <?php echo esc_html($row['value_2']); ?>
+                                            </td>
+                                            <td class="<?php echo 'is-' . $row['color_3']; ?>">
+                                                <?php echo esc_html($row['value_3']); ?>
+                                            </td>
+                                            <td class="<?php echo 'is-' . $row['color_4']; ?>">
+                                                <?php echo esc_html($row['value_4']); ?>
+                                            </td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+
+                            </table>
+                        </div>
+                    <?php endif; ?>
+
+                    <!-- Note -->
+                    <?php if (have_rows('bo_list')): ?>
+                        <div class="bo-list">
+                            <?php while (have_rows('bo_list')): the_row(); ?>
+                                <div class="bo-list-item default-box-style">
+                                    <div class="bo-title"><?php the_sub_field('list_title'); ?></div>
+                                    <div class="bo-description"><?php the_sub_field('list_description'); ?></div>
+                                </div>
+                            <?php endwhile; ?>
+                        </div>
+                    <?php endif; ?>
+
+                </div>
+            </section>
+        <?php
+        elseif (get_row_layout() === 'bottom_line'):
+
+            $header  = get_sub_field('header');
+            $content    = get_sub_field('content');
+        ?>
+
+            <section class="bottom-line-section sec-pad gradient-bg">
+                <div class="container">
+
+                    <!-- Header -->
+                    <div class="section-header text-center">
+                        <?php
+                        if (strpos($header['title'], '#') === 0) {
+                            $title = preg_replace('/^#\s*/', '', $header['title']);
+                            echo '<h2 class="section-title"><span class="highlight">#</span> ' . esc_html($title) . '</h2>';
+                        } else {
+                            echo '<h2 class="section-title">' . esc_html($header['title']) . '</h2>';
+                        }
+                        ?>
+
+                        <?php if ($header['subtitle']): ?>
+                            <p class="section-subtitle"><?php echo esc_html($header['subtitle']); ?></p>
+                        <?php endif; ?>
+                    </div>
+                    <?php if ($content) : ?>
+                        <div class="bottom-line-content default-box-style">
+                            <?php echo $content; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </section>
+        <?php
+        elseif (get_row_layout() === 'faq_section') : ?>
+
+            <section class="faq-section sec-pad" itemscope itemtype="https://schema.org/FAQPage">
+                <div class="container">
+
+                    <?php
+                    $header = get_sub_field('header');
+                    if (!empty($header['title'])) :
+                    ?>
+                        <div class="section-header text-center">
+                            <?php
+                            if (strpos($header['title'], '#') === 0) {
+                                $title = preg_replace('/^#\s*/', '', $header['title']);
+                                echo '<h2 class="section-title"><span class="highlight">#</span> ' . esc_html($title) . '</h2>';
+                            } else {
+                                echo '<h2 class="section-title">' . esc_html($header['title']) . '</h2>';
+                            }
+                            ?>
+
+                        </div>
+                    <?php endif; ?>
+
+                    <?php if (have_rows('faq_list')) : ?>
+                        <div class="faq-list">
+
+                            <?php while (have_rows('faq_list')) : the_row();
+                                $question = get_sub_field('question');
+                                $answer   = get_sub_field('answer');
+                            ?>
+
+                                <div class="faq-item default-box-style" itemscope itemprop="mainEntity" itemtype="https://schema.org/Question">
+
+                                    <button class="faq-question" onclick="toggleFaq(this)" itemprop="name">
+                                        <?php echo esc_html($question); ?>
+                                        <span class="faq-toggle-icon faq-arrow"></span>
+                                    </button>
+
+                                    <div class="faq-content" itemscope itemprop="acceptedAnswer" itemtype="https://schema.org/Answer">
+                                        <p itemprop="text">
+                                            <?php echo esc_html($answer); ?>
+                                        </p>
+                                    </div>
+
+                                </div>
+
+                            <?php endwhile; ?>
+
+                        </div>
+                    <?php endif; ?>
+
+                </div>
+            </section>
+<?php
+        endif;
+    endwhile;
+endif;
+get_footer();
+?>
