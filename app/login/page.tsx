@@ -1,14 +1,12 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import AuthLayout from '../components/AuthLayout';
 
-
 export default function LoginPage() {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const [step, setStep] = useState<'login' | 'twofa'>('login');
   const [formData, setFormData] = useState({ email: '', password: '' });
@@ -20,10 +18,12 @@ export default function LoginPage() {
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    if (searchParams.get('error') === 'google_auth_failed') {
-      setError('Google authentication failed. Please try again.');
-    }
-  }, [searchParams]);
+  const params = new URLSearchParams(window.location.search);
+
+  if (params.get('error') === 'google_auth_failed') {
+    setError('Google authentication failed. Please try again.');
+  }
+}, []);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     setFormData({ ...formData, [e.target.name]: e.target.value });
