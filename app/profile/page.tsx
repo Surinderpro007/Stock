@@ -19,8 +19,9 @@ const MONTHS = [
 ];
 
 export default function ProfilePage() {
-  const [profile, setProfile] = useState<ProfileData | null>(null);
-   const [countryCode, setCountryCode] = useState('+91');
+   const [profile, setProfile] = useState<ProfileData | null>(null);
+  const [name, setName] = useState('');
+  const [countryCode, setCountryCode] = useState('+91');
   const [countryIso, setCountryIso] = useState('in');
   const [showCountryDropdown, setShowCountryDropdown] = useState(false);
   const [mobile, setMobile] = useState('');
@@ -39,6 +40,7 @@ export default function ProfilePage() {
 
       if (res.ok) {
         setProfile(data.user);
+        setName(data.user.name || '');
         setCountryCode(data.user.countryCode || '+91');
         const matched = countries.find((c) => c.code === (data.user.countryCode || '+91'));
         setCountryIso(matched ? matched.iso : 'in');
@@ -95,6 +97,7 @@ export default function ProfilePage() {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
+        name,
         mobile,
         countryCode,
         profileImage: imagePreview,
@@ -176,13 +179,13 @@ export default function ProfilePage() {
           </div>
 
           <div className="space-y-5">
-            <div>
+                        <div>
               <label className="block text-sm text-[#14140F] mb-1.5">Name</label>
               <input
                 type="text"
-                value={profile.name}
-                disabled
-                className="w-full px-4 py-2.5 bg-[#EFEDE4] border border-[#DDD8CC] rounded-md text-[#6B6858]"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                className="w-full px-4 py-2.5 bg-white border border-[#DDD8CC] rounded-md text-[#14140F] focus:outline-none focus:border-[#B8935F] focus:ring-1 focus:ring-[#B8935F] transition-colors"
               />
             </div>
 

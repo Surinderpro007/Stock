@@ -48,7 +48,7 @@ export default function RegisterPage() {
     }
   }
 
-  async function handleVerify(e: React.FormEvent) {
+    async function handleVerify(e: React.FormEvent) {
     e.preventDefault();
     setError('');
     setLoading(true);
@@ -61,14 +61,34 @@ export default function RegisterPage() {
       });
 
       const data = await res.json();
-      setLoading(false);
 
       if (!res.ok) {
         setError(data.error);
+        setLoading(false);
         return;
       }
 
-      router.push('/login');
+      // Verification success — auto-login with the same email/password
+      // so the user doesn't have to type them again on the login page.
+      const loginRes = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: formData.email,
+          password: formData.password,
+          rememberMe: false,
+        }),
+      });
+
+      setLoading(false);
+
+      if (loginRes.ok) {
+        router.push('/dashboard');
+        router.refresh();
+      } else {
+        // Fallback: rare case where auto-login fails, send them to login page
+        router.push('/login');
+      }
     } catch {
       setError('Something went wrong, please try again');
       setLoading(false);

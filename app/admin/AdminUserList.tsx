@@ -11,6 +11,9 @@ interface User {
   role: string;
   isVerified: boolean;
   isSuspended: boolean;
+  isDeactivated: boolean;
+  pendingDeletion: boolean;
+  deletionScheduledAt: string | null;
   twoFAEnabled: boolean;
   createdAt: string;
   profileImage: string;
@@ -96,6 +99,33 @@ export default function AdminUserList() {
 
       await fetchUsers();
       setSelectedUser((prev) => (prev ? { ...prev, isSuspended: newValue } : prev));
+    } catch {
+      setActionError('Something went wrong');
+      setActionLoading(false);
+    }
+  }
+
+    async function handleDeactivateToggle(user: User) {
+    setActionError('');
+    setActionLoading(true);
+    const newValue = !user.isDeactivated;
+
+    try {
+      const res = await fetch(`/api/admin/users/${user._id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ deactivate: newValue }),
+      });
+      const data = await res.json();
+      setActionLoading(false);
+
+      if (!res.ok) {
+        setActionError(data.error);
+        return;
+      }
+
+      await fetchUsers();
+      setSelectedUser((prev) => (prev ? { ...prev, isDeactivated: newValue } : prev));
     } catch {
       setActionError('Something went wrong');
       setActionLoading(false);
@@ -204,8 +234,20 @@ export default function AdminUserList() {
                       {u.role}
                     </span>
                   </td>
-                  <td className="px-4 py-3">
-                    {u.isSuspended ? (
+                                    <td className="px-4 py-3">
+                    {u.pendingDeletion ? (
+                      <span className="text-xs text-red-600">
+                        Pending Deletion
+                        {u.deletionScheduledAt
+                          ? ` (${new Date(u.deletionScheduledAt).toLocaleDateString('en-IN', {
+                              day: 'numeric',
+                              month: 'short',
+                            })})`
+                          : ''}
+                      </span>
+                    ) : u.isDeactivated ? (
+                      <span className="text-xs text-[#6B6858]">Deactivated</span>
+                    ) : u.isSuspended ? (
                       <span className="text-xs text-red-600">Suspended</span>
                     ) : u.isVerified ? (
                       <span className="text-xs text-[#122A22]">Active</span>
@@ -266,7 +308,7 @@ export default function AdminUserList() {
         </div>
       )}
 
-      {/* User detail / manage panel */}
+            {/* User detail / manage panel */}
       {selectedUser && (
         <div
           className="fixed inset-0 bg-black/40 flex items-center justify-center px-6 z-50"
@@ -309,6 +351,20 @@ export default function AdminUserList() {
                 <span className="text-[#6B6858]">Verified</span>
                 <span className="text-[#14140F]">{selectedUser.isVerified ? 'Yes' : 'No'}</span>
               </div>
+              {selectedUser.pendingDeletion && (
+                <div className="flex justify-between">
+                  <span className="text-[#6B6858]">Scheduled deletion</span>
+                  <span className="text-red-600">
+                    {selectedUser.deletionScheduledAt
+                      ? new Date(selectedUser.deletionScheduledAt).toLocaleDateString('en-IN', {
+                          day: 'numeric',
+                          month: 'short',
+                          year: 'numeric',
+                        })
+                      : '—'}
+                  </span>
+                </div>
+              )}
             </div>
 
             {actionError && (
@@ -334,6 +390,13 @@ export default function AdminUserList() {
                   {selectedUser.isSuspended ? 'Unsuspend User' : 'Suspend User'}
                 </button>
                 <button
+                  onClick={() => handleDeactivateToggle(selectedUser)}
+                  disabled={actionLoading}
+                  className="w-full border border-[#DDD8CC] text-[#14140F] py-2 rounded-md text-sm hover:bg-[#F7F5EF] disabled:opacity-50 transition-colors"
+                >
+                  {selectedUser.isDeactivated ? 'Reactivate User' : 'Deactivate User'}
+                </button>
+                <button
                   onClick={() => setConfirmDelete(true)}
                   className="w-full border border-red-300 text-red-700 py-2 rounded-md text-sm hover:bg-red-50 transition-colors"
                 >
@@ -347,9 +410,11 @@ export default function AdminUserList() {
                 </button>
               </div>
             ) : (
-              <div className="bg-red-50 border border-red-200 rounded-md p-4 space-y-3">
+                            <div className="bg-red-50 border border-red-200 rounded-md p-4 space-y-3">
                 <p className="text-sm text-red-700">
-                  Permanently delete {selectedUser.name}? This cannot be undone.
+                  Move {selectedUser.name} to Deleted Users? Account access will be blocked
+                  immediately, but you can still restore or permanently delete it from the
+                  &quot;Deleted&quot; tab.
                 </p>
                 <div className="flex gap-2">
                   <button
@@ -363,7 +428,7 @@ export default function AdminUserList() {
                     disabled={actionLoading}
                     className="flex-1 bg-red-700 text-white py-2 rounded-md text-sm hover:bg-red-800 disabled:opacity-50 transition-colors"
                   >
-                    {actionLoading ? 'Deleting...' : 'Confirm Delete'}
+                    {actionLoading ? 'Moving...' : 'Move to Deleted'}
                   </button>
                 </div>
               </div>
@@ -374,3 +439,4 @@ export default function AdminUserList() {
     </div>
   );
 }
+    

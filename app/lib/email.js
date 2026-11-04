@@ -30,12 +30,12 @@ async function sendOtpEmail(toEmail, otp, purpose) {
   const selected = config[purpose] || config.reset;
 
   await transporter.sendMail({
-    from: '"AuthApp" <' + process.env.GMAIL_USER + '>',
+    from: '"StockApp" <' + process.env.GMAIL_USER + '>',
     to: toEmail,
     subject: selected.subject,
     html:
       '<div style="font-family: sans-serif; max-width: 480px; margin: 0 auto;">' +
-      '<p style="color: #B8935F; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;">AuthApp</p>' +
+      '<p style="color: #B8935F; font-size: 12px; letter-spacing: 2px; text-transform: uppercase;">StockApp</p>' +
       '<h2 style="color: #14140F;">' + selected.heading + '</h2>' +
       '<p style="color: #6B6858; font-size: 14px;">' + selected.description + '</p>' +
       '<div style="background: #F7F5EF; border: 1px solid #DDD8CC; border-radius: 8px; padding: 20px; text-align: center; margin: 20px 0;">' +

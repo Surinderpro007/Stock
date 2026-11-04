@@ -16,8 +16,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Login required' }, { status: 401 });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as DecodedToken;
-    const result = await requestDeleteOtp(decoded.id);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as DecodedToken;
+    const { password } = await req.json().catch(() => ({ password: undefined }));
+    const result = await requestDeleteOtp(decoded.id, password);
 
     return NextResponse.json(result, { status: 200 });
   } catch (error: any) {

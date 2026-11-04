@@ -58,7 +58,7 @@ export default function AuthLayout({
           </div>
 
           <p className="font-mono text-xs tracking-[0.2em] text-[#B8935F] mb-4 uppercase">
-            Auth App // Secure Access
+            Stock App // Secure Access
           </p>
           <h1 className="font-serif text-4xl text-[#F7F5EF] leading-tight">
             Secure Your Digital World with Confidence

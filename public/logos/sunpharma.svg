@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <rect width="120" height="120" rx="16" fill="#FFFFFF"/>
+  <!-- Sun Rising Emblem -->
+  <g transform="translate(35, 14)">
+    <circle cx="25" cy="28" r="14" fill="#F7941D"/>
+    <!-- Sun Rays -->
+    <line x1="25" y1="6" x2="25" y2="10" stroke="#F7941D" stroke-width="3" stroke-linecap="round"/>
+    <line x1="10" y1="13" x2="13" y2="16" stroke="#F7941D" stroke-width="3" stroke-linecap="round"/>
+    <line x1="40" y1="13" x2="37" y2="16" stroke="#F7941D" stroke-width="3" stroke-linecap="round"/>
+    <line x1="4" y1="28" x2="8" y2="28" stroke="#F7941D" stroke-width="3" stroke-linecap="round"/>
+    <line x1="46" y1="28" x2="42" y2="28" stroke="#F7941D" stroke-width="3" stroke-linecap="round"/>
+    <!-- Base Wave / Horizon -->
+    <path d="M 2,42 C 16,36 34,48 48,42" stroke="#004A99" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+  </g>
+  <!-- Wordmark -->
+  <text x="60" y="86" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11.5" font-weight="900" fill="#004A99" letter-spacing="1">SUN</text>
+  <text x="60" y="102" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="800" fill="#F7941D" letter-spacing="1.5">PHARMA</text>
+</svg>

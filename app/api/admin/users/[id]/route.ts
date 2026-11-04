@@ -7,6 +7,9 @@ import {
   getUserById,
   updateUserRole,
   toggleSuspendUser,
+  toggleDeactivateUser,
+  requestUserDeletion,
+  restoreDeletedUser,
   deleteUserByAdmin,
 } from '../../../../../controllers/adminController';
 import connectDB from '../../../../../config/db';
@@ -65,8 +68,17 @@ export async function PATCH(
       return NextResponse.json(result, { status: 200 });
     }
 
-    if (body.suspend !== undefined) {
+        if (body.suspend !== undefined) {
       const result = await toggleSuspendUser(admin, id, Boolean(body.suspend));
+      return NextResponse.json(result, { status: 200 });
+    }
+
+    if (body.deactivate !== undefined) {
+      const result = await toggleDeactivateUser(admin, id, Boolean(body.deactivate));
+      return NextResponse.json(result, { status: 200 });
+    }
+     if (body.restore !== undefined) {
+      const result = await restoreDeletedUser(admin, id);
       return NextResponse.json(result, { status: 200 });
     }
 
@@ -84,7 +96,13 @@ export async function DELETE(
   try {
     const admin = await requireAdmin();
     const { id } = await params;
-    const result = await deleteUserByAdmin(admin, id);
+    const permanent = req.nextUrl.searchParams.get('permanent') === 'true';
+
+    // Default = soft delete (moves to the "Deleted" tab). ?permanent=true = irreversible.
+    const result = permanent
+      ? await deleteUserByAdmin(admin, id)
+      : await requestUserDeletion(admin, id);
+
     return NextResponse.json(result, { status: 200 });
   } catch (error: any) {
     const status = error.message === 'UNAUTHORIZED' ? 401 : error.message === 'FORBIDDEN' ? 403 : 400;

@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <rect width="120" height="120" rx="16" fill="#FFFFFF"/>
+  <rect x="14" y="20" width="92" height="52" rx="6" fill="#FFC20E"/>
+  <!-- Arc / sunburst -->
+  <path d="M 28,54 C 28,34 92,34 92,54 Z" fill="#000000"/>
+  <circle cx="60" cy="54" r="14" fill="#FFC20E"/>
+  <!-- Wordmark inside badge -->
+  <text x="60" y="66" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="11" font-weight="900" fill="#000000" letter-spacing="-0.3">UltraTech</text>
+  <!-- Cement Bar -->
+  <rect x="14" y="78" width="92" height="24" rx="4" fill="#000000"/>
+  <text x="60" y="94" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10" font-weight="900" fill="#FFC20E" letter-spacing="2">CEMENT</text>
+</svg>

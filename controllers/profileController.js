@@ -1,14 +1,19 @@
 const User = require('../models/User');
 const connectDB = require('../config/db');
+const { ensureWallet } = require('../services/walletService');
+const { roundMoney } = require('../lib/money');
+const { httpError } = require('../lib/apiError');
 const { isValidPhoneNumber } = require('libphonenumber-js');
 
 async function getProfile(userId) {
   await connectDB();
 
-  const user = await User.findById(userId).select('-password');
+  const user = await User.findById(userId).select('-password').lean();
   if (!user) {
-    throw new Error('User nahi mila');
+    throw httpError('User not found', 404);
   }
+
+  const wallet = await ensureWallet(userId);
 
   return {
     id: user._id,
@@ -18,6 +23,7 @@ async function getProfile(userId) {
     mobile: user.mobile,
     profileImage: user.profileImage,
     dob: user.dob,
+    balance: roundMoney(wallet.balance),
     createdAt: user.createdAt,
     twoFAEnabled: user.twoFAEnabled,
     role: user.role,
@@ -25,10 +31,14 @@ async function getProfile(userId) {
   };
 }
 
-async function updateProfile(userId, { mobile, countryCode, profileImage, dob }) {
+async function updateProfile(userId, { name, mobile, countryCode, profileImage, dob }) {
   await connectDB();
 
   const updateData = {};
+
+  if (name !== undefined && name.trim()) {
+    updateData.name = name.trim();
+  }
 
   if (mobile !== undefined) {
     if (mobile === '') {
@@ -38,7 +48,7 @@ async function updateProfile(userId, { mobile, countryCode, profileImage, dob })
       const fullNumber = `${cc}${mobile}`;
 
       if (!isValidPhoneNumber(fullNumber)) {
-        throw new Error('Enter a valid mobile number for the selected country');
+        throw httpError('Enter a valid mobile number for the selected country', 400);
       }
 
       updateData.mobile = mobile.trim();
@@ -51,14 +61,15 @@ async function updateProfile(userId, { mobile, countryCode, profileImage, dob })
 
   const user = await User.findByIdAndUpdate(userId, updateData, {
     new: true,
-  }).select('-password');
+  }).select('-password').lean();
 
   if (!user) {
-    throw new Error('User nahi mila');
+    throw httpError('User not found', 404);
   }
 
+  const wallet = await ensureWallet(userId);
 
-   return {
+  return {
     id: user._id,
     name: user.name,
     email: user.email,
@@ -66,6 +77,7 @@ async function updateProfile(userId, { mobile, countryCode, profileImage, dob })
     mobile: user.mobile,
     profileImage: user.profileImage,
     dob: user.dob,
+    balance: roundMoney(wallet.balance),
     createdAt: user.createdAt,
     twoFAEnabled: user.twoFAEnabled,
     role: user.role,
@@ -73,4 +85,7 @@ async function updateProfile(userId, { mobile, countryCode, profileImage, dob })
   };
 }
 
-module.exports = { getProfile, updateProfile };
+module.exports = {
+  getProfile,
+  updateProfile,
+};

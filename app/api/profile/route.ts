@@ -30,16 +30,33 @@ async function getUserIdFromToken() {
 }
 
 export async function GET(req: NextRequest) {
-  try {
+  const BLOCKED_MESSAGES: Record<string, string> = {
+    ACCOUNT_SUSPENDED: 'Your account has been suspended. Contact support for help.',
+    ACCOUNT_DEACTIVATED: 'Your account has been deactivated. Contact support to reactivate it.',
+    ACCOUNT_DELETED: 'Your account has been deleted by an administrator. Contact support for help.',
+  };
+
+   try {
     const userId = await getUserIdFromToken();
     const profile = await getProfile(userId);
-
     return NextResponse.json({ user: profile }, { status: 200 });
   } catch (error: any) {
-    return NextResponse.json(
-      { error: error.message || 'Something went wrong' },
-      { status: 401 }
+    // 👇 Terminal
+    console.error('PROFILE API ERROR:', error);
+
+    const blockedMessage = BLOCKED_MESSAGES[error.message];
+    const isAuthError = error.message === 'Login required' || error.name === 'JsonWebTokenError' || error.name === 'TokenExpiredError';
+
+    const response = NextResponse.json(
+      { error: blockedMessage || error.message || 'Something went wrong', blocked: !!blockedMessage },
+      { status: isAuthError || blockedMessage ? 401 : 500 } // 
     );
+
+    if (blockedMessage) {
+      response.cookies.set('token', '', { httpOnly: true, expires: new Date(0), path: '/' });
+    }
+
+    return response;
   }
 }
 
@@ -47,9 +64,9 @@ export async function PUT(req: NextRequest) {
   try {
     const userId = await getUserIdFromToken();
     const body = await req.json();
-        const { mobile, countryCode, profileImage, dob } = body;
+        const { name, mobile, countryCode, profileImage, dob } = body;
 
-    const profile = await updateProfile(userId, { mobile, countryCode, profileImage, dob });
+    const profile = await updateProfile(userId, { name, mobile, countryCode, profileImage, dob });
 
     return NextResponse.json(
       { message: 'Profile updated', user: profile },

@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <rect width="120" height="120" rx="16" fill="#141414"/>
+  <!-- Circular Titan Seal -->
+  <circle cx="60" cy="46" r="28" stroke="#D4AF37" stroke-width="2.5" fill="none"/>
+  <!-- Titan 'T' Serif Monogram -->
+  <text x="60" y="56" text-anchor="middle" font-family="Georgia, serif" font-size="28" font-weight="normal" fill="#FFFFFF">T</text>
+  <!-- Wordmark -->
+  <text x="60" y="94" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF" letter-spacing="4">TITAN</text>
+  <text x="60" y="106" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="7" font-weight="600" fill="#D4AF37" letter-spacing="2">A TATA ENTERPRISE</text>
+</svg>

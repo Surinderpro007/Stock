@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <rect width="120" height="120" rx="16" fill="#FFFFFF"/>
+  <g transform="translate(10, 15)">
+    <!-- Asian Paints distinctive ribbon AP mark -->
+    <!-- Yellow Ribbon loop (top / right) -->
+    <path d="M 52,22 C 58,14 70,12 78,18 C 86,24 88,36 82,44 C 76,52 64,54 56,48 Z" fill="#FFC20E"/>
+    <path d="M 50,30 C 56,22 68,22 74,28 C 80,34 78,44 70,50 L 50,30 Z" fill="#FFB300" opacity="0.6"/>
+    <!-- Red Ribbon stroke (left loop forming 'a') -->
+    <path d="M 42,20 C 30,16 18,24 16,38 C 14,52 24,64 38,64 C 48,64 54,58 58,50 C 50,56 38,56 30,50 C 22,44 24,34 32,28 C 36,24 40,22 46,22 Z" fill="#ED1C24"/>
+    <!-- Blue/Purple Ribbon loop (descender forming 'p') -->
+    <path d="M 54,34 C 54,28 58,24 64,24 C 72,24 76,32 74,40 C 72,48 64,54 56,52 L 48,74 C 46,79 42,82 36,80 C 31,78 30,73 32,68 L 44,40 C 48,36 52,34 54,34 Z" fill="#872B90"/>
+    <path d="M 48,46 L 36,74 C 34,78 38,80 42,78 L 54,50 Z" fill="#6F1B78"/>
+    <!-- Small red ribbon tail -->
+    <path d="M 38,36 C 44,36 48,40 48,46 C 48,52 42,56 36,56 C 30,56 28,50 30,44 C 32,38 36,36 38,36 Z" fill="#D31219"/>
+  </g>
+  <!-- Asian Paints Wordmark -->
+  <text x="60" y="105" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif" font-size="11" font-weight="800" fill="#231F20" letter-spacing="-0.3">asianpaints</text>
+</svg>

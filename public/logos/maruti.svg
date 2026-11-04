@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <rect width="120" height="120" rx="16" fill="#FFFFFF"/>
+  <!-- Suzuki 'S' Emblem -->
+  <g transform="translate(36, 14)">
+    <path d="M 44,4 L 14,4 L 4,14 L 32,14 L 8,30 L 34,30 L 44,20 L 16,20 L 40,4 Z" fill="#E31E24"/>
+    <path d="M 4,48 L 34,48 L 44,38 L 16,38 L 40,22 L 14,22 L 4,32 L 32,32 L 8,48 Z" fill="#003E7E"/>
+  </g>
+  <!-- Wordmark -->
+  <text x="60" y="86" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="10.5" font-weight="900" fill="#003E7E" letter-spacing="1">MARUTI</text>
+  <text x="60" y="101" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="9" font-weight="800" fill="#E31E24" letter-spacing="1.5">SUZUKI</text>
+</svg>

@@ -28,11 +28,12 @@ export async function GET(req: NextRequest) {
     }
 
     const searchParams = req.nextUrl.searchParams;
-    const search = searchParams.get('search') || '';
+        const search = searchParams.get('search') || '';
     const page = parseInt(searchParams.get('page') || '1', 10);
     const sortBy = searchParams.get('sortBy') || 'joined';
+    const status = searchParams.get('status') || 'active'; // 'active' | 'deleted'
 
-    const result = await getAllUsers({ search, page, limit: 15, sortBy });
+    const result = await getAllUsers({ search, page, limit: 15, sortBy, status });
 
     return NextResponse.json(result, { status: 200 });
   } catch (error: any) {

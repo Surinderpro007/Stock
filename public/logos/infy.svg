@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <rect width="120" height="120" rx="16" fill="#FFFFFF"/>
+  <rect x="15" y="32" width="90" height="42" rx="8" fill="#007CC3"/>
+  <!-- Infosys Serif Wordmark in pure white inside brand blue container -->
+  <text x="60" y="60" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="20" font-weight="bold" font-style="italic" fill="#FFFFFF" letter-spacing="-0.5">Infosys</text>
+  <!-- Slogan -->
+  <text x="60" y="94" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="7.5" font-weight="600" fill="#007CC3" letter-spacing="0.8">NAVIGATE YOUR NEXT</text>
+</svg>

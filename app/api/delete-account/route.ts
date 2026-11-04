@@ -15,10 +15,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Login required' }, { status: 401 });
     }
 
-    const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as DecodedToken;
-    const { password, otp } = await req.json();
+        const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as DecodedToken;
+    const { otp } = await req.json();
 
-    const result = await deleteAccount(decoded.id, { password, otp });
+    const result = await deleteAccount(decoded.id, otp);
 
     const response = NextResponse.json(result, { status: 200 });
     response.cookies.set('token', '', { httpOnly: true, expires: new Date(0), path: '/' });

@@ -103,10 +103,66 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: null,
     },
+        deleteOtp: {
+      type: String,
+      default: null,
+    },
+    deleteOtpExpiry: {
+      type: Date,
+      default: null,
+    },
+    emailChangeOtp: {
+      type: String,
+      default: null,
+    },
+    emailChangeOtpExpiry: {
+      type: Date,
+      default: null,
+    },
+    // timestamp when the CURRENT email OTP was successfully verified —
+    // step 2 (new email OTP) is only allowed within a short window after this
+    emailChangeVerifiedAt: {
+      type: Date,
+      default: null,
+    },
+    newEmailOtp: {
+      type: String,
+      default: null,
+    },
+    newEmailOtpExpiry: {
+      type: Date,
+      default: null,
+    },
+    // the new email the second OTP was actually sent to — checked at the
+    // final step so the submitted newEmail can't be swapped afterwards
+    pendingNewEmail: {
+      type: String,
+      default: null,
+    },
+     isDeactivated: {
+      type: Boolean,
+      default: false,
+    },
+    pendingDeletion: {
+      type: Boolean,
+      default: false,
+    },
+     deletedByAdmin: {
+      type: Boolean,
+      default: false,
+    },
+    deletionScheduledAt: {
+      type: Date,
+      default: null,
+    },
     
   },
   { timestamps: true }
 );
+
+if (process.env.NODE_ENV !== 'production' && mongoose.models.User) {
+  delete mongoose.models.User;
+}
 
 const User = mongoose.models.User || mongoose.model('User', userSchema);
 

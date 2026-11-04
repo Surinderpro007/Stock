@@ -2,20 +2,29 @@ const User = require('../models/User');
 const AuditLog = require('../models/AuditLog');
 const connectDB = require('../config/db');
 
-async function getAllUsers({ search = '', page = 1, limit = 15, sortBy = 'joined' }) {
+async function getAllUsers({ search = '', page = 1, limit = 15, sortBy = 'joined', status = 'active' }) {
   await connectDB();
 
   const adminEmail = (process.env.ADMIN_EMAIL || '').toLowerCase();
   const skip = (page - 1) * limit;
 
-  const matchStage = search
-    ? {
-        $or: [
-          { name: { $regex: search, $options: 'i' } },
-          { email: { $regex: search, $options: 'i' } },
-        ],
-      }
-    : {};
+  const conditions = [];
+
+  if (search) {
+    conditions.push({
+      $or: [
+        { name: { $regex: search, $options: 'i' } },
+        { email: { $regex: search, $options: 'i' } },
+      ],
+    });
+  }
+
+  // "active" tab excludes users pending deletion; "deleted" tab shows only them
+  conditions.push(
+    status === 'deleted' ? { pendingDeletion: true } : { pendingDeletion: { $ne: true } }
+  );
+
+  const matchStage = conditions.length > 1 ? { $and: conditions } : conditions[0];
 
   // roleRank: Super Admin = 0, Admin = 1, User = 2 — always applied first
   const addRankStage = {
@@ -168,6 +177,98 @@ async function toggleSuspendUser(admin, targetUserId, suspend) {
   return { message: suspend ? 'User suspended' : 'User unsuspended' };
 }
 
+async function toggleDeactivateUser(admin, targetUserId, deactivate) {
+  await connectDB();
+
+  if (String(admin._id) === targetUserId) {
+    throw new Error('You cannot deactivate your own account from here');
+  }
+
+  const user = await User.findById(targetUserId);
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  if (isSuperAdmin(user)) {
+    throw new Error('This account is the Super Admin and cannot be modified');
+  }
+
+  user.isDeactivated = deactivate;
+  await user.save();
+
+  await logAction({
+    adminId: admin._id,
+    adminName: admin.name,
+    action: deactivate ? 'ADMIN_DEACTIVATE' : 'ADMIN_REACTIVATE',
+    targetUserId: user._id,
+    targetUserEmail: user.email,
+    details: deactivate ? 'Account deactivated by admin' : 'Account reactivated by admin',
+  });
+
+  return { message: deactivate ? 'User deactivated' : 'User reactivated' };
+}
+
+// Step 1: soft delete — moves the user to the "Deleted" tab, nothing is removed yet
+async function requestUserDeletion(admin, targetUserId) {
+  await connectDB();
+
+  if (String(admin._id) === targetUserId) {
+    throw new Error('You cannot delete your own account from here');
+  }
+
+  const user = await User.findById(targetUserId);
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  if (isSuperAdmin(user)) {
+    throw new Error('This account is the Super Admin and cannot be deleted');
+  }
+
+  user.pendingDeletion = true;
+  user.deletedByAdmin = true;
+  user.deletionScheduledAt = new Date();
+  await user.save();
+
+  await logAction({
+    adminId: admin._id,
+    adminName: admin.name,
+    action: 'DELETE_REQUESTED',
+    targetUserId: user._id,
+    targetUserEmail: user.email,
+    details: 'User account moved to pending deletion by admin',
+  });
+
+  return { message: 'User moved to Deleted tab' };
+}
+
+// Step 2a: undo — brings the user back to the normal Users tab
+async function restoreDeletedUser(admin, targetUserId) {
+  await connectDB();
+
+  const user = await User.findById(targetUserId);
+  if (!user) {
+    throw new Error('User not found');
+  }
+
+  user.pendingDeletion = false;
+  user.deletedByAdmin = false;
+  user.deletionScheduledAt = null;
+  await user.save();
+
+  await logAction({
+    adminId: admin._id,
+    adminName: admin.name,
+    action: 'RESTORE_USER',
+    targetUserId: user._id,
+    targetUserEmail: user.email,
+    details: 'User account restored from pending deletion',
+  });
+
+  return { message: 'User restored' };
+}
+
+// Step 2b: irreversible — only callable from the Deleted tab
 async function deleteUserByAdmin(admin, targetUserId) {
   await connectDB();
 
@@ -211,12 +312,26 @@ async function getAuditLogs({ page = 1, limit = 20 }) {
 
   return { logs, total, page, totalPages: Math.ceil(total / limit) };
 }
+async function deleteAuditLog(logId) {
+  await connectDB();
+
+  const log = await AuditLog.findByIdAndDelete(logId);
+  if (!log) {
+    throw new Error('Log entry not found');
+  }
+
+  return { message: 'Log entry deleted' };
+}
 
 module.exports = {
   getAllUsers,
   getUserById,
   updateUserRole,
   toggleSuspendUser,
+  requestUserDeletion,
+  restoreDeletedUser,
   deleteUserByAdmin,
   getAuditLogs,
+  deleteAuditLog,
+  toggleDeactivateUser
 };

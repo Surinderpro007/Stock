@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 120" width="120" height="120">
+  <rect width="120" height="120" rx="16" fill="#FFFFFF"/>
+  <circle cx="60" cy="46" r="32" fill="#002060"/>
+  <circle cx="60" cy="46" r="28" fill="#FFFFFF"/>
+  <circle cx="60" cy="46" r="26" fill="#002060"/>
+  <!-- L&T Monogram -->
+  <text x="60" y="55" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="22" font-weight="900" fill="#FFFFFF" letter-spacing="1">L&amp;T</text>
+  <!-- Larsen & Toubro Wordmark -->
+  <text x="60" y="94" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="9.5" font-weight="800" fill="#002060" letter-spacing="0.5">LARSEN &amp; TOUBRO</text>
+  <text x="60" y="106" text-anchor="middle" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="7.5" font-weight="600" fill="#6B6858" letter-spacing="1">ENGINEERING</text>
+</svg>
