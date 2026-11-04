@@ -29,7 +29,7 @@ export default async function Home() {
   const cookieStore = await cookies();
   const isLoggedIn = Boolean(cookieStore.get('token')?.value);
   const allStocks = await getAllStocks();
-  const indianStocks = allStocks.filter((stock) => !stock.market || stock.market === 'IN');
+  const indianStocks = allStocks.filter((stock: any) => !stock.market || stock.market === 'IN');
   const snapshotStocks = indianStocks.slice(0, 8);
 
   return (

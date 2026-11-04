@@ -18,12 +18,12 @@ export default function MarketStatusBadge({
   const now = new Date(nowMs);
   const status = getMarketStatus(market, now);
   const live =
-    status.isOpen &&
-    isQuoteLive({
-      priceTime,
-      quoteUpdatedAt: quoteUpdatedAt || lastUpdated,
-      now,
-    });
+  status.isOpen &&
+  isQuoteLive({
+    priceTime,
+    quoteUpdatedAt: quoteUpdatedAt || lastUpdated,
+    now,
+  });
   const label = liveLabel(status, live);
   const ping = live;
 
