@@ -1,4 +1,4 @@
-// app/dashboard/page.tsx
+// app/dashboard/x
 
 import { cookies } from 'next/headers';
 import jwt from 'jsonwebtoken';
