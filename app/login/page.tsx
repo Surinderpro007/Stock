@@ -1,14 +1,14 @@
   'use client';
 
-  import { useState, useEffect } from 'react';
-  import { useRouter, useSearchParams } from 'next/navigation';
-  import Link from 'next/link';
-  import AuthLayout from '../components/AuthLayout';
+import { useState, useEffect } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
+import AuthLayout from '../components/AuthLayout';
 
 
-  export default function LoginPage() {
-    const router = useRouter();
-    const searchParams = useSearchParams();
+export default function LoginPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
 
     const [step, setStep] = useState<'login' | 'twofa'>('login');
     const [formData, setFormData] = useState({ email: '', password: '' });
@@ -19,14 +19,11 @@
     const [loading, setLoading] = useState(false);
     const [showPassword, setShowPassword] = useState(false);
 
-      useEffect(() => {
-      if (searchParams.get('error') === 'google_auth_failed') {
-        setError('Google authentication failed. Please try again.');
-      }
-      if (searchParams.get('blocked') === '1') {
-        setError('Your account access has been changed by an administrator. Please contact support if you think this is a mistake.');
-      }
-    }, [searchParams]);
+  useEffect(() => {
+    if (searchParams.get('error') === 'google_auth_failed') {
+      setError('Google authentication failed. Please try again.');
+    }
+  }, [searchParams]);
 
     function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
       setFormData({ ...formData, [e.target.name]: e.target.value });
