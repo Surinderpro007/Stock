@@ -3,12 +3,14 @@
 # dependencies
 /node_modules
 /.pnp
+build/
 .pnp.*
 .yarn/*
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
 !.yarn/versions
+CLAUDE.md
 
 # testing
 /coverage
