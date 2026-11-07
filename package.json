@@ -12,6 +12,7 @@
     "test": "node --test-concurrency=1 --test tests/tradeMath.test.js tests/accessControl.test.js tests/newsAndWallet.test.js tests/watchlistAndCategories.test.js tests/ordersAndLimits.test.js tests/marketStatus.test.js"
   },
   "dependencies": {
+    "@vercel/analytics": "^2.0.1",
     "bcryptjs": "^3.0.3",
     "dotenv": "^17.4.2",
     "ejs": "^6.0.1",

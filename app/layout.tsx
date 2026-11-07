@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import AuthSync from './components/AuthSync';
 import { Manrope, Geist } from "next/font/google";
+import { Analytics } from '@vercel/analytics/next';
 import "./globals.css";
 
 const manrope = Manrope({
@@ -37,6 +38,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       <body className="min-h-full flex flex-col font-sans">
         <AuthSync />
         {children}
+        <Analytics />
       </body>
     </html>
   );
